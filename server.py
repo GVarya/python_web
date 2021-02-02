@@ -1,11 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+import time
+
+
 
 server = Flask(__name__)
 
 messages = [
-{'username':'varya','text':'Привет'},
-{'username':'opopio','text':'Пока'},
-{'username':'fgh','text':'Привет и пока'}
+{'username':'varya','text':'Привет', "timestamp": time.time()},
+{'username':'opopio','text':'Пока', "timestamp": time.time()},
+{'username':'fgh','text':'Привет и пока', "timestamp": time.time()}
 ]
 
 
@@ -21,8 +24,14 @@ def hello():
 
 
 def get_messages():
+    after = float(request.args["after"])
+    result = []
+
+    for message in messages:
+        if message["timestamp"] > after:
+            result.append(message)
     return{
-    'messages': messages
+        "messages": result
 }
 
 
@@ -38,6 +47,16 @@ def day(num):
     return render_template(f"day-{num}.html")
 
 
+@server.route('/send_messages')
+
+def send_messages():
+
+
+    messages.append({
+        "username": request.json["username"],
+        "text": request.json["text"],
+        "timestamp": time.time()
+    })
 
 
 
